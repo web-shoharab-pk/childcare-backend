@@ -40,8 +40,7 @@ export const logRequest = (options: LogRequestOptions = {}) => {
       logger.info(`${req.method} ${req.originalUrl}`, {
         statusCode: res.statusCode,
       });
-      return oldEnd.apply(this, args);
-      oldEnd.apply(this, args);
+      return oldEnd.apply(this, args as [any, BufferEncoding, (() => void)?]);
     };
 
     next();
