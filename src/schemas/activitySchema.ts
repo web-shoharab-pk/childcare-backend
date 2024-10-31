@@ -28,9 +28,15 @@ export const activityZodSchema = z.object({
     .refine((date) => !isNaN(date.getTime()), {
       message: "Invalid date format",
     }),
-
+  maxAttendees: z.number({
+    required_error: "Max attendees is required",
+    invalid_type_error: "Max attendees must be a number",
+  }),
   attendees: z.array(objectIdSchema).optional().default([]),
-
+  price: z.number({
+    required_error: "Price is required",
+    invalid_type_error: "Price must be a number",
+  }),
   location: z
     .string({
       required_error: "Location is required",
@@ -65,7 +71,12 @@ export const activityUpdateZodSchema = z
       .optional(),
 
     attendees: z.array(objectIdSchema).optional(),
-
+    price: z
+      .number({
+        required_error: "Price is required",
+        invalid_type_error: "Price must be a number",
+      })
+      .optional(),
     location: z
       .string({
         invalid_type_error: "Location must be a string",

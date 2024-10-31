@@ -1,6 +1,7 @@
 import path from "path";
 import { createLogger, format, transports } from "winston";
 import "winston-daily-rotate-file";
+import { envConfig } from "../config/envConfig";
 
 // Use relative path for logs directory
 const LOG_DIR = "logs";
@@ -46,7 +47,7 @@ class LogManager {
       ],
     });
 
-    if (process.env.NODE_ENV !== "production") {
+    if (envConfig.NODE_ENV !== "production") {
       this.logger.add(
         new transports.Console({
           format: format.combine(format.colorize(), format.simple()),
@@ -54,10 +55,10 @@ class LogManager {
       );
     }
   }
-
   private getCorrelationId(): string | undefined {
-    if (global.requestContext && global.requestContext.headers) {
-      return global.requestContext.headers["x-trace-id"];
+    const requestContext = (global as any).requestContext;
+    if (requestContext?.headers) {
+      return requestContext.headers["x-trace-id"];
     }
     return undefined;
   }

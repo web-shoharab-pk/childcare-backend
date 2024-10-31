@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { MongoError } from "mongodb";
 import { ZodError } from "zod";
+import { envConfig } from "../config/envConfig";
 
 interface CustomError extends Error {
   status?: number;
@@ -37,7 +38,7 @@ export const errorHandler = (
       trace_id: req.headers["x-trace-id"],
       message: "Database Error",
       error:
-        process.env.NODE_ENV === "production"
+        envConfig.NODE_ENV === "production"
           ? "Database operation failed"
           : err.message,
     });
@@ -110,10 +111,10 @@ export const errorHandler = (
     trace_id: req.headers["x-trace-id"],
     message: "Internal Server Error",
     error:
-      process.env.NODE_ENV === "production"
+      envConfig.NODE_ENV === "production"
         ? "Something went wrong"
         : err.message,
-    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
+    stack: envConfig.NODE_ENV === "development" ? err.stack : undefined,
   });
   return;
 };

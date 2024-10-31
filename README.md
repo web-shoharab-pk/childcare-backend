@@ -38,14 +38,29 @@ A robust Express.js API built with TypeScript for managing childcare activities 
 3. Configure environment variables:
    Create a `.env` file in the root directory with the following:
    ```
-   PORT=5000
-   MONGO_URI=mongodb://localhost:27017/childcareDB
-   CLERK_SECRET_KEY=your_clerk_secret_key
-   COOKIE_MAX_AGE=604800000
-   COOKIE_HTTP_ONLY=true
-   COOKIE_SECURE=true
-   COOKIE_NAME='childcare-auth-token'
-   SERVER_URL=http://localhost:5000
+   PORT=
+   NODE_ENV= # development, production
+   MONGO_URI=
+   JWT_SECRET=
+   
+   CLERK_SECRET_KEY=
+
+   # Cookie settings
+   COOKIE_MAX_AGE=
+   COOKIE_HTTP_ONLY=
+   COOKIE_SECURE=
+   COOKIE_NAME=
+
+   SERVER_URL=
+   FRONTEND_URL=
+   # Stripe
+   STRIPE_SECRET_KEY=
+   STRIPE_WEBHOOK_SECRET=
+
+   # Email Config
+   SMPT_MAIL=
+   SMPT_SERVICE=
+   SMPT_PASSWORD=
    ```
 
 4. Start the development server:
@@ -85,5 +100,3 @@ The API will be available at `http://localhost:5000`
 ## API Documentation
 For detailed API documentation, please visit:
 [Postman Documentation](https://documenter.getpostman.com/view/16481716/2sAY4vh2sG)
-
-

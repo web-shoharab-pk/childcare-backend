@@ -12,25 +12,24 @@ import { mongodbIdSchema } from "../schemas/mongodbIdSchema";
 const router = Router();
 
 // router.use("/", activityService);
+// All routes require authentication
+router.use(authenticate);
 
 router.post(
-  "/",
-  authenticate,
+    "/", 
   authorize(["admin"]),
   validateRequest(activityZodSchema),
   ActivityController.createActivity
 );
 
 router.get(
-  "/",
-  authenticate,
+  "/", 
   authorize(["admin"]),
   ActivityController.getActivities
 );
 
 router.patch(
-  "/:id",
-  authenticate,
+  "/:id", 
   authorize(["admin"]),
   validateRequest(mongodbIdSchema, true),
   validateRequest(activityUpdateZodSchema),
@@ -39,7 +38,6 @@ router.patch(
 
 router.delete(
   "/:id",
-  authenticate,
   authorize(["admin"]),
   validateRequest(mongodbIdSchema, true),
   ActivityController.deleteActivity
@@ -47,7 +45,6 @@ router.delete(
 
 router.post(
   "/:id/attendance",
-  authenticate,
   authorize(["admin"]),
   validateRequest(mongodbIdSchema, true),
   validateRequest(activityAttendanceUpdateSchema),

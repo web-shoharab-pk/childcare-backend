@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { envConfig } from "../config/envConfig";
 import { verifyToken } from "../utils/jwt";
 
 export const authenticate = (
@@ -6,7 +7,7 @@ export const authenticate = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies[process.env.COOKIE_NAME as string];
+  const token = req.cookies[envConfig.COOKIE_NAME as string];
   if (!token) {
     res.status(401).json({
       success: false,

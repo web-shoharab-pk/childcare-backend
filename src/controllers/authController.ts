@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { NextFunction, Request, Response } from "express";
 import clerkClient from "../config/clerkConfig";
+import { envConfig } from "../config/envConfig";
 import { AppError } from "../middlewares/error";
 import { User } from "../models/User";
 import { generateToken } from "../utils/jwt";
@@ -116,11 +117,11 @@ export class AuthController {
 
       // Set the token in a cookie
       res
-        .cookie(process.env.COOKIE_NAME as string, token, {
+        .cookie(envConfig.COOKIE_NAME as string, token, {
           httpOnly: true, // Helps prevent XSS attacks
-          secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+          secure: envConfig.NODE_ENV === "production", // Use secure cookies in production
           sameSite: "strict", // Helps prevent CSRF attacks
-          maxAge: parseInt(process.env.COOKIE_MAX_AGE as string), // 7 days
+          maxAge: parseInt(envConfig.COOKIE_MAX_AGE as unknown as string), // 7 days
         })
         .json({
           success: true,

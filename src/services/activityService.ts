@@ -1,9 +1,10 @@
 import dotenv from "dotenv";
 import { createProxyMiddleware } from "http-proxy-middleware";
+import { envConfig } from "../config/envConfig";
 dotenv.config();
 
 const activityService = createProxyMiddleware({
-  target: process.env.SERVER_URL, // The address of your Activity Tracking Service
+  target: envConfig.SERVER_URL, // The address of your Activity Tracking Service
   changeOrigin: true,
 });
 

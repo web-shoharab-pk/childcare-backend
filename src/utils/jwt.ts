@@ -1,13 +1,14 @@
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import { envConfig } from "../config/envConfig";
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = envConfig.JWT_SECRET as string;
 
 export const generateToken = (userId: string, role: string) => {
   const token = jwt.sign({ userId, role }, JWT_SECRET, {
-    expiresIn: process.env.COOKIE_MAX_AGE,
+    expiresIn: envConfig.COOKIE_MAX_AGE,
   });
   return token;
 };
