@@ -47,7 +47,6 @@ app.get("/health", (req: Request, res: Response) => {
     platform: process.platform,
     nodeVersion: process.version,
   });
-  return;
 });
 
 app.use("*", (req: Request, res: Response) => {
