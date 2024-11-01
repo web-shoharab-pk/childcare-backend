@@ -100,58 +100,42 @@ The API will be available at `http://localhost:5000`
     "nodeVersion": "v16.x.x"
   }
   ```
-### Load balancer status
 
-- `GET /loadbalancer/status`: Check API load balancer status
+### Load Balancer Status
+
+- `GET /loadbalancer/status`: Check load balancer operational status
   ```json
-  {  
-  "status": "operational",  
-  "timestamp": "2024-11-01T04:22:45.950Z",  
-  "environment": "production",  
-  "services": {  
-    "activity": {  
-      "instances": [  
-        "https://childcare-backend-uyed.onrender.com"  
-      ],  
-      "currentIndex": 0,  
-      "totalInstances": 1,  
-      "healthStatus": {  
-        "https://childcare-backend-uyed.onrender.com": true  
-      }  
-    },  
-    "booking": {  
-      "instances": [  
-        "https://childcare-backend-uyed.onrender.com"  
-      ],  
-      "currentIndex": 0,  
-      "totalInstances": 1,  
-      "healthStatus": {  
-        "https://childcare-backend-uyed.onrender.com": true  
-      }  
-    },  
-    "auth": {  
-      "instances": [  
-        "https://childcare-backend-uyed.onrender.com"  
-      ],  
-      "currentIndex": 0,  
-      "totalInstances": 1,  
-      "healthStatus": {  
-        "https://childcare-backend-uyed.onrender.com": true  
-      }  
-    }  
-  },  
-  "health": {  
-    "activity": {  
-      "https://childcare-backend-uyed.onrender.com": true  
-    },  
-    "booking": {  
-      "https://childcare-backend-uyed.onrender.com": true  
-    },  
-    "auth": {  
-      "https://childcare-backend-uyed.onrender.com": true  
-    }  
-  }  
-}
+  {
+    "status": "operational",
+    "timestamp": "2024-11-01T04:22:45.950Z",
+    "environment": "production",
+    "services": {
+      "activity": {
+        "instances": ["https://childcare-backend-uyed.render.com"],
+        "currentIndex": 0,
+        "totalInstances": 1,
+        "healthStatus": {
+          "https://childcare-backend-uyed.render.com": true
+        }
+      },
+      "booking": {
+        "instances": ["https://childcare-backend-uyed.render.com"],
+        "currentIndex": 0,
+        "totalInstances": 1,
+        "healthStatus": {
+          "https://childcare-backend-uyed.render.com": true
+        }
+      },
+      "auth": {
+        "instances": ["https://childcare-backend-uyed.render.com"],
+        "currentIndex": 0,
+        "totalInstances": 1,
+        "healthStatus": {
+          "https://childcare-backend-uyed.render.com": true
+        }
+      }
+    }
+  }
   ```
 
 ## API Documentation
@@ -159,26 +143,22 @@ The API will be available at `http://localhost:5000`
 For detailed API documentation, please visit:
 [Postman Documentation](https://documenter.getpostman.com/view/16481716/2sAY4viNnz)
 
-<!-- When you hit the deployed application because it's deployed for free hosting, that's why when user is inactive for a long time, the application is going to sleep and when someone hits the application, it takes time to wake up -->
-
 ## Application URL
 
-- The deployed application can be accessed at:
-  ```
-  https://childcare-backend-uyed.onrender.com
-  ```
-- Please note that our application is hosted on a free service, which may result in periods of inactivity leading to the application entering a sleep mode. Consequently, when a user attempts to access the application after a period of inactivity, there may be a slight delay as the application wakes up. We appreciate your understanding.
+The application is deployed at:
+```
+https://childcare-backend-uyed.render.com
+```
 
-<!-- When you send requests to the deployed application, the requests are automatically forwarded to the load balancer -->
+**Note:** This application is hosted on a free-tier service. During periods of inactivity, the application enters sleep mode to conserve resources. As a result, the first request after a period of inactivity may experience a brief delay while the application restarts. Subsequent requests will perform normally.
 
-## Load Balancer
+## Load Balancer Configuration
 
-- Although the application is currently running as a monolithic server, you can still reference the load balancer for future scalability:
-  ```
-  LOAD_BALANCER_URL=http://localhost:5000
-  ```
+While currently operating as a monolithic application, the system is designed with future scalability in mind. The load balancer can be configured using:
+```
+LOAD_BALANCER_URL=http://localhost:5000
+```
 
-## Node Version
+## Node Version Requirements
 
-- Node version must be greater than 16 and less than 21
-
+- Supported Node.js versions: >16.x.x and <21.x.x
