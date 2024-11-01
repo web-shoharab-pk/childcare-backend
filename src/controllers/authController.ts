@@ -200,4 +200,13 @@ export class AuthController {
       }
     }
   }
+
+  // Logout
+  static async logout(req: Request, res: Response, next: NextFunction) {
+    res.clearCookie(envConfig.COOKIE_NAME as string).json({
+      success: true,
+      trace_id: req.headers["x-trace-id"],
+      message: "Logout successful",
+    });
+  }
 }

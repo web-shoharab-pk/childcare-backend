@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AppError } from "../middlewares/error";
 import { Activity } from "../models/Activity";
 import logger from "../utils/logger";
+import { Booking } from "../models/Booking";
 
 export class ActivityController {
   // Create a new activity
@@ -198,47 +199,58 @@ export class ActivityController {
   // Generate activity report
   static async generateReport(req: Request, res: Response, next: NextFunction) {
     try {
-      // Get all activities with populated attendee details
+      // Retrieve all activities with populated attendee details
       const activities = await Activity.find()
         .populate("attendees", "name email")
-        .sort({ date: -1 }); // Sort by date descending
+        .sort({ date: -1 }); // Sort activities by date in descending order
 
+      // Check if any activities were found
       if (!activities.length) {
         logger.warn("No activities found for report generation");
-        next(new AppError("No activities found", "NO_ACTIVITIES", 404));
+        return next(new AppError("No activities found", "NO_ACTIVITIES", 404));
       }
+
       // Generate report statistics
-      const reportData = {
-        totalActivities: activities.length,
-        upcomingActivities: activities.filter(
-          (a) => new Date(a.date) > new Date()
-        ).length,
-        pastActivities: activities.filter((a) => new Date(a.date) <= new Date())
-          .length,
-        averageAttendance:
-          activities.reduce((acc, curr) => acc + curr.attendees.length, 0) /
-          activities.length,
-        activitiesByLocation: activities.reduce(
-          (acc: Record<string, number>, curr) => {
-            acc[curr.location] = (acc[curr.location] || 0) + 1;
-            return acc;
-          },
-          {}
-        ),
-        activities: activities.map((activity) => ({
+      const totalActivities = activities.length;
+      const upcomingActivities = activities.filter(a => new Date(a.date) > new Date()).length;
+      const pastActivities = totalActivities - upcomingActivities;
+      const averageAttendance = totalActivities ? 
+        activities.reduce((acc, curr) => acc + curr.attendees.length, 0) / totalActivities : 0;
+
+      const activitiesByLocation = activities.reduce((acc: Record<string, number>, curr) => {
+        acc[curr.location] = (acc[curr.location] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Calculate total bookings for each activity
+      const bookingsPromises = activities.map(async (activity) => {
+        const totalBookings = await Booking.countDocuments({ activityId: activity._id });
+        return {
           id: activity._id,
           name: activity.name,
           date: activity.date,
           location: activity.location,
           attendeeCount: activity.attendees.length,
           description: activity.description,
-        })),
+          totalBookings, // Add total bookings under each activity
+        };
+      });
+
+      const detailedActivities = await Promise.all(bookingsPromises);
+
+      const reportData = {
+        totalActivities,
+        upcomingActivities,
+        pastActivities,
+        averageAttendance,
+        activitiesByLocation,
+        activities: detailedActivities,
       };
 
       logger.info("Activity report generated successfully", {
-        totalActivities: reportData.totalActivities,
-        upcomingActivities: reportData.upcomingActivities,
-        pastActivities: reportData.pastActivities,
+        totalActivities,
+        upcomingActivities,
+        pastActivities,
       });
 
       res.status(200).json({
@@ -249,13 +261,7 @@ export class ActivityController {
       });
     } catch (error) {
       logger.error("Failed to generate activity report", { error });
-      next(
-        new AppError(
-          "Failed to generate activity report",
-          "REPORT_GENERATION_ERROR",
-          500
-        )
-      );
+      next(new AppError("Failed to generate activity report", "REPORT_GENERATION_ERROR", 500));
     }
   }
 

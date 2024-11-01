@@ -104,7 +104,7 @@ The API will be available at `http://localhost:5000`
 ## API Documentation
 
 For detailed API documentation, please visit:
-[Postman Documentation](https://documenter.getpostman.com/view/16481716/2sAY4vh2sG)
+[Postman Documentation](https://documenter.getpostman.com/view/16481716/2sAY4viNnz)
 
 <!-- When you hit the deployed application because it's deployed for free hosting, that's why when user is inactive for a long time, the application is going to sleep and when someone hits the application, it takes time to wake up -->
 

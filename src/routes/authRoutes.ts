@@ -28,4 +28,6 @@ router.patch(
   AuthController.resetPassword
 );
 
+router.post("/logout", authenticate, AuthController.logout);
+
 export default router;
