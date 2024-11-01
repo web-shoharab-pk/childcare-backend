@@ -20,6 +20,13 @@ export class AuthController {
     });
 
     const { email, password, role } = req.body;
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      logger.warn("Email already registered", { email });
+      next(new AppError("Email already registered", null, 409));
+      return;
+    }
 
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -165,7 +172,7 @@ export class AuthController {
       try {
         const isPasswordValid = await bcrypt.compare(
           oldPassword,
-          user?.password as string
+          user.password as string
         );
         if (!isPasswordValid) {
           res.status(401).json({
@@ -217,7 +224,7 @@ export class AuthController {
     res.clearCookie(envConfig.COOKIE_NAME as string).json({
       success: true,
       trace_id: req.headers["x-trace-id"],
-      message: "Logout successful",
+      message: "Logged out successfully",
     });
   }
 }

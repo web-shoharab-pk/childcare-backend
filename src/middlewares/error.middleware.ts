@@ -15,13 +15,15 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.error("Error:", {
-    name: err.name,
-    message: err.message,
-    stack: err.stack,
-    path: req.path,
-    method: req.method,
-  });
+  if (envConfig.NODE_ENV === "development") {
+    console.error("Error:", {
+      name: err.name,
+      message: err.message,
+      stack: err.stack,
+      path: req.path,
+      method: req.method,
+    });
+  }
 
   // Handle MongoDB specific errors
   if (err instanceof MongoError) {

@@ -60,8 +60,12 @@ childcare-backend/
 │   │   └── user.schema.ts
 │   ├── services/
 │   │   └── loadBalancer.ts
-│   ├── types/
-│   │   └── Role.ts
+│   ├── tests/
+│   │   ├── unit/
+│   │   │   ├── controller/
+│   │   │   │   └── auth.test.ts
+│   │   ├── types/
+│   │   │   └── Role.ts
 │   ├── utils/
 │   │   ├── email.ts
 │   │   ├── logger.ts

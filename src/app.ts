@@ -118,13 +118,4 @@ app.use("*", (req: Request, res: Response) => {
 // Global error handler
 app.use(errorHandler);
 
-const PORT = envConfig.PORT || 5000;
-
-// Database connection and server start
-connectMongo();
-
-app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`); // Use logger instead of console.log
-});
-
 export default app;

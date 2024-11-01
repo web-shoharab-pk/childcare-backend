@@ -1,7 +1,11 @@
 import dotenv from "dotenv";
-dotenv.config();
-
+import path from "path";
 // Load environment variables only once
+// Load environment variables based on NODE_ENV
+const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
+dotenv.config({
+  path: path.resolve(__dirname, `../../${envFile}`)
+});
 
 export const envConfig = {
   PORT: process.env.PORT || 5000,

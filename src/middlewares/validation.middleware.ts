@@ -23,6 +23,8 @@ export const validateRequest = (
               value: params[key],
             });
             res.status(400).json({
+              success: false,
+              traceId: req.headers["x-trace-id"],
               message: "Validation failed",
               errors: [
                 {
@@ -48,6 +50,8 @@ export const validateRequest = (
           })),
         });
         res.status(400).json({
+          success: false,
+          traceId: req.headers["x-trace-id"],
           message: "Validation failed",
           errors: error.errors.map((err) => ({
             field: err.path.join("."),
