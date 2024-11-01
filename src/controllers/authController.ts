@@ -112,7 +112,7 @@ export class AuthController {
       }
 
       const token = generateToken(user.id, user.role);
-      console.log("token", token);
+
       logger.info("User logged in successfully", { email });
 
       // Set the token in a cookie
