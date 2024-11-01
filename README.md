@@ -100,6 +100,59 @@ The API will be available at `http://localhost:5000`
     "nodeVersion": "v16.x.x"
   }
   ```
+### Load balancer status
+
+- `GET /loadbalancer/status`: Check API load balancer status
+  ```json
+  {  
+  "status": "operational",  
+  "timestamp": "2024-11-01T04:22:45.950Z",  
+  "environment": "production",  
+  "services": {  
+    "activity": {  
+      "instances": [  
+        "https://childcare-backend-uyed.onrender.com"  
+      ],  
+      "currentIndex": 0,  
+      "totalInstances": 1,  
+      "healthStatus": {  
+        "https://childcare-backend-uyed.onrender.com": true  
+      }  
+    },  
+    "booking": {  
+      "instances": [  
+        "https://childcare-backend-uyed.onrender.com"  
+      ],  
+      "currentIndex": 0,  
+      "totalInstances": 1,  
+      "healthStatus": {  
+        "https://childcare-backend-uyed.onrender.com": true  
+      }  
+    },  
+    "auth": {  
+      "instances": [  
+        "https://childcare-backend-uyed.onrender.com"  
+      ],  
+      "currentIndex": 0,  
+      "totalInstances": 1,  
+      "healthStatus": {  
+        "https://childcare-backend-uyed.onrender.com": true  
+      }  
+    }  
+  },  
+  "health": {  
+    "activity": {  
+      "https://childcare-backend-uyed.onrender.com": true  
+    },  
+    "booking": {  
+      "https://childcare-backend-uyed.onrender.com": true  
+    },  
+    "auth": {  
+      "https://childcare-backend-uyed.onrender.com": true  
+    }  
+  }  
+}
+  ```
 
 ## API Documentation
 
@@ -114,7 +167,7 @@ For detailed API documentation, please visit:
   ```
   https://childcare-backend-uyed.onrender.com
   ```
-- When you hit the deployed application because it's deployed for free hosting, that's why when user is inactive for a long time, the application is going to sleep and when someone hits the application, it takes time to wake up
+- Please note that our application is hosted on a free service, which may result in periods of inactivity leading to the application entering a sleep mode. Consequently, when a user attempts to access the application after a period of inactivity, there may be a slight delay as the application wakes up. We appreciate your understanding.
 
 <!-- When you send requests to the deployed application, the requests are automatically forwarded to the load balancer -->
 
