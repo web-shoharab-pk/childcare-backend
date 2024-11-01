@@ -22,8 +22,6 @@ A robust Express.js API built with TypeScript for managing childcare activities 
 - MongoDB installed and running locally
 - Clerk account with API keys
 
-// ... previous content ...
-
 ## Project Structure
 
 ```
@@ -75,10 +73,12 @@ childcare-backend/
 │   └── app.ts
 ├── logs/
 ├── dist/
+├── coverage/
 ├── .env
 ├── .env.example
 ├── .gitignore
 ├── .npmrc
+├── jest.config.js
 ├── LICENSE
 ├── package.json
 ├── README.md
@@ -102,7 +102,7 @@ childcare-backend/
 - **tests/**: Test files (not implemented)
 
   - **integration/**: Integration tests (not implemented)
-  - **unit/**: Unit tests (not implemented)
+  - **unit/**: Unit tests (auth.controller.ts implemented)
 
 - **logs/**: Application logs directory
 - **.env**: Environment variables (not tracked in git)
