@@ -91,3 +91,7 @@ export const activityUpdateZodSchema = z
 export const activityAttendanceUpdateSchema = z.object({
   userId: objectIdSchema,
 });
+
+export const activityIdZodSchema = z.object({
+  activityId: objectIdSchema,
+});

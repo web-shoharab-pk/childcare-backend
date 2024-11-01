@@ -3,6 +3,7 @@ import { stripe } from "../config/stripe";
 import { AppError } from "../middlewares/error";
 import { Activity } from "../models/Activity";
 import { Booking, BookingStatus } from "../models/Booking";
+import { sendBookingConfirmation } from "../utils/email";
 import logger from "../utils/logger"; // Import the logger
 
 export class BookingController {
@@ -90,14 +91,18 @@ export class BookingController {
   }
 
   // Confirm booking
-  static async confirmBooking(req: Request, res: Response) {
-    const { bookingId, paymentStatus } = req.body;
+  static async confirmBooking(req: Request, res: Response, next: NextFunction) {
+    const { bookingId } = req.params;
+    const { paymentStatus } = req.body;
 
     try {
-      const booking = await Booking.findById(bookingId);
+      const booking = await Booking.findById(bookingId)
+        .populate("activityId")
+        .populate("userId");
       if (!booking) {
         logger.warn("Booking not found: " + bookingId);
-        return res.status(404).json({ message: "Booking not found" });
+        next(new AppError(`Booking not found: ${bookingId}`, null, 404));
+        return;
       }
 
       // Update booking confirmation based on payment status
@@ -105,18 +110,36 @@ export class BookingController {
         booking.isConfirmed = true;
         booking.paymentStatus = "completed";
         await booking.save();
-
+        await sendBookingConfirmation(booking);
         logger.info("Booking confirmed successfully: " + bookingId);
-        res.json({ message: "Booking confirmed successfully", booking });
+        res.status(200).json({
+          message: "Booking confirmed successfully",
+          booking: {
+            id: booking.id,
+            activity: booking.activityId
+              ? (booking.activityId as any).name
+              : null,
+            date: booking.date,
+            totalAmount: booking.totalAmount,
+            paymentStatus: booking.paymentStatus,
+          },
+        });
+        return;
       } else {
         logger.warn("Payment not completed for booking: " + bookingId);
-        res.status(400).json({ message: "Payment not completed" });
+        res.status(400).json({
+          success: false,
+          message:
+            "Payment not completed. Please ensure that your payment was processed successfully and try again.",
+          advice: "If the issue persists, contact support for assistance.",
+          errors: ["PAYMENT_NOT_COMPLETED"],
+          traceId: req.headers["x-trace-id"],
+        });
+        return;
       }
     } catch (error) {
       logger.error("Failed to confirm booking: " + error);
-      res
-        .status(500)
-        .json({ error: "Failed to confirm booking", details: error });
+      return next(new AppError("Failed to confirm booking", error, 500));
     }
   }
 
@@ -126,18 +149,17 @@ export class BookingController {
     res: Response,
     next: NextFunction
   ) {
-    const { id } = req.params;
+    const { activityId } = req.params;
     try {
-      const activity = await Activity.findById(id);
-      console.log("activity", activity);
+      const activity = await Activity.findById(activityId);
       if (!activity) {
-        logger.warn("Activity not found: ", { id });
+        logger.warn("Activity not found: ", { activityId });
         next(new AppError("Activity not found", null, 404));
         return;
       }
 
       // Count bookings for this activity
-      const bookingCount = await Booking.countDocuments({ activityId: id });
+      const bookingCount = await Booking.countDocuments({ activityId });
       const maxAttendees = activity.maxAttendees; //  maximum capacity for an activity
 
       const available = bookingCount < maxAttendees;
@@ -201,7 +223,6 @@ export class BookingController {
         existingBooking.paymentStatus = "refunded";
         // TODO: Integrate with payment provider to process refund
         // For now, just update the status
-   
       }
 
       await existingBooking.save();
@@ -215,6 +236,48 @@ export class BookingController {
     } catch (error) {
       logger.error(`Failed to cancel booking: ${error}`);
       next(new AppError("Failed to cancel booking", error, 500));
+    }
+  }
+
+  // Get user bookings
+  static async getUserBookings(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { userId } = req.params;
+    try {
+      const bookings = await Booking.find({ userId }).populate("activityId");
+      res.json({
+        success: true,
+        traceId: req.headers["x-trace-id"],
+        bookings,
+      });
+    } catch (error) {
+      logger.error(`Failed to get user bookings: ${error}`);
+      next(new AppError("Failed to get user bookings", error, 500));
+    }
+  }
+
+  // Get activity bookings
+  static async getActivityBookings(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { activityId } = req.params;
+    try {
+      const bookings = await Booking.find({ activityId }).populate(
+        "activityId"
+      );
+      res.json({
+        success: true,
+        traceId: req.headers["x-trace-id"],
+        bookings,
+      });
+    } catch (error) {
+      logger.error(`Failed to get activity bookings: ${error}`);
+      next(new AppError("Failed to get activity bookings", error, 500));
     }
   }
 }

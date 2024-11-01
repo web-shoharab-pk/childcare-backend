@@ -124,3 +124,8 @@ For detailed API documentation, please visit:
   ```
   LOAD_BALANCER_URL=http://localhost:5000
   ```
+
+## Node Version
+
+- Node version must be greater than 16 and less than 21
+
