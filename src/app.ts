@@ -2,7 +2,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Request, Response } from "express";
 import helmet from "helmet";
-import { connectMongo } from "./config/database";
 import { envConfig } from "./config/environment";
 import { errorHandler } from "./middlewares/error.middleware";
 import { proxyRequest } from "./middlewares/loadBalancer.middleware";
@@ -48,7 +47,7 @@ app.use((req, res, next) => {
 app.use(`${baseUrl}/auth`, proxyRequest("auth"), authRoutes);
 app.use(`${baseUrl}/activities`, proxyRequest("activity"), activityRoutes);
 app.use(`${baseUrl}/bookings`, proxyRequest("booking"), bookingRoutes);
-app.use(
+app.post(
   `${baseUrl}/webhook`,
   express.raw({ type: "application/json" }),
   webhookHandler
