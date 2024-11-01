@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { MongoError } from "mongodb";
 import { ZodError } from "zod";
-import { envConfig } from "../config/envConfig";
+import { envConfig } from "../config/environment";
 
 interface CustomError extends Error {
   status?: number;
@@ -28,6 +28,7 @@ export const errorHandler = (
     if (err.code === 11000) {
       // Duplicate key error
       res.status(409).json({
+        success: false,
         trace_id: req.headers["x-trace-id"],
         message: "Duplicate Entry",
         error: "A record with this information already exists",
@@ -35,6 +36,7 @@ export const errorHandler = (
       return;
     }
     res.status(400).json({
+      success: false,
       trace_id: req.headers["x-trace-id"],
       message: "Database Error",
       error:
@@ -48,6 +50,7 @@ export const errorHandler = (
   // Handle Zod validation errors
   if (err instanceof ZodError) {
     res.status(400).json({
+      success: false,
       trace_id: req.headers["x-trace-id"],
       message: "Validation Error",
       errors: err.errors.map((e) => ({
@@ -61,6 +64,7 @@ export const errorHandler = (
   // Handle known HTTP errors
   if (err.status) {
     res.status(err.status).json({
+      success: false,
       trace_id: req.headers["x-trace-id"],
       message: err.message,
       error: err.name,
@@ -72,6 +76,7 @@ export const errorHandler = (
   // Handle JWT errors
   if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
     res.status(401).json({
+      success: false,
       trace_id: req.headers["x-trace-id"],
       message: "Authentication Error",
       error: err.message,
@@ -82,6 +87,7 @@ export const errorHandler = (
   // Handle validation errors
   if (err.name === "ValidationError") {
     res.status(400).json({
+      success: false,
       trace_id: req.headers["x-trace-id"],
       message: "Validation Error",
       error: err.message,
@@ -91,6 +97,7 @@ export const errorHandler = (
   // Handle unauthorized errors
   if (err.name === "UnauthorizedError") {
     res.status(401).json({
+      success: false,
       trace_id: req.headers["x-trace-id"],
       message: "Unauthorized",
       error: err.message,
@@ -100,6 +107,7 @@ export const errorHandler = (
   // Handle forbidden errors
   if (err.name === "ForbiddenError") {
     res.status(403).json({
+      success: false,
       trace_id: req.headers["x-trace-id"],
       message: "Forbidden",
       error: err.message,
@@ -108,6 +116,7 @@ export const errorHandler = (
 
   // Default server error
   res.status(500).json({
+    success: false,
     trace_id: req.headers["x-trace-id"],
     message: "Internal Server Error",
     error:

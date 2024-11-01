@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { ActivityController } from "../controllers/ActivityController";
-import { authenticate, authorize } from "../middlewares/authMiddleware";
-import { validateRequest } from "../middlewares/request-validator";
+import { ActivityController } from "../controllers/activity.controller";
+import { authenticate, authorize } from "../middlewares/auth.middleware";
+import { validateRequest } from "../middlewares/validation.middleware";
 import {
   activityAttendanceUpdateSchema,
   activityUpdateZodSchema,
   activityZodSchema,
-} from "../schemas/activitySchema";
-import { mongodbIdSchema } from "../schemas/mongodbIdSchema";
+} from "../schemas/activity.schema";
+import { mongodbIdSchema } from "../schemas/mongodbId.schema";
 
 const router = Router();
 
@@ -16,20 +16,16 @@ const router = Router();
 router.use(authenticate);
 
 router.post(
-    "/", 
+  "/",
   authorize(["admin"]),
   validateRequest(activityZodSchema),
   ActivityController.createActivity
 );
 
-router.get(
-  "/", 
-  authorize(["admin"]),
-  ActivityController.getActivities
-);
+router.get("/", authorize(["admin"]), ActivityController.getActivities);
 
 router.patch(
-  "/:id", 
+  "/:id",
   authorize(["admin"]),
   validateRequest(mongodbIdSchema, true),
   validateRequest(activityUpdateZodSchema),

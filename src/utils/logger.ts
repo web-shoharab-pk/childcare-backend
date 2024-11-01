@@ -1,7 +1,7 @@
 import path from "path";
 import { createLogger, format, transports } from "winston";
 import "winston-daily-rotate-file";
-import { envConfig } from "../config/envConfig";
+import { envConfig } from "../config/environment";
 
 // Use relative path for logs directory
 const LOG_DIR = "logs";
@@ -9,8 +9,10 @@ const LOG_DIR = "logs";
 class LogManager {
   private static instance: LogManager;
   private logger: any;
+  nodeEnv: string;
 
   constructor() {
+    this.nodeEnv = envConfig.NODE_ENV || "development";
     this.logger = createLogger({
       level: "info",
       format: format.combine(
@@ -47,7 +49,7 @@ class LogManager {
       ],
     });
 
-    if (envConfig.NODE_ENV !== "production") {
+    if (this.nodeEnv !== "production") {
       this.logger.add(
         new transports.Console({
           format: format.combine(format.colorize(), format.simple()),

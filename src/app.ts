@@ -2,14 +2,14 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Request, Response } from "express";
 import helmet from "helmet";
-import { envConfig } from "./config/envConfig";
-import { connectMongo } from "./config/mongo";
-import { errorHandler } from "./middlewares/error";
-import { proxyRequest } from "./middlewares/loadBalancerMiddleware";
+import { connectMongo } from "./config/database";
+import { envConfig } from "./config/environment";
+import { errorHandler } from "./middlewares/error.middleware";
+import { proxyRequest } from "./middlewares/loadBalancer.middleware";
 import { setCorrelationId } from "./middlewares/setCorrelationId";
-import activityRoutes from "./routes/activityRoutes";
-import authRoutes from "./routes/authRoutes";
-import bookingRoutes from "./routes/bookingRoutes";
+import activityRoutes from "./routes/activity.routes";
+import authRoutes from "./routes/auth.routes";
+import bookingRoutes from "./routes/booking.routes";
 import { LoadBalancer } from "./services/loadBalancer";
 import logger from "./utils/logger"; // Import the logger
 import { webhookHandler } from "./webhooks/webhook";
@@ -122,8 +122,9 @@ const PORT = envConfig.PORT || 5000;
 
 // Database connection and server start
 connectMongo();
-// Connect to PostgreSQL here with TypeORM setup
 
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`); // Use logger instead of console.log
 });
+
+export default app;

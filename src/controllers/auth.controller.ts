@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import { NextFunction, Request, Response } from "express";
-import clerkClient from "../config/clerkConfig";
-import { envConfig } from "../config/envConfig";
-import { AppError } from "../middlewares/error";
+import clerkClient from "../config/clerk";
+import { envConfig } from "../config/environment";
+import { AppError } from "../middlewares/error.middleware";
 import { User } from "../models/User";
 import { generateToken } from "../utils/jwt";
 import logger from "../utils/logger";
@@ -39,10 +39,14 @@ export class AuthController {
           });
 
           next(
-            new AppError("Invalid registration details", clerkError.errors, 422)
+            new AppError(
+              "Email or password is invalid. Please check your registration details and try again.",
+              clerkError.errors,
+              422
+            )
           );
         }
-        throw clerkError; // Re-throw other clerk errors to be caught by outer catch
+        return;
       }
 
       // If Clerk user created successfully, create local user
@@ -63,7 +67,7 @@ export class AuthController {
           logger.warn("Email already registered", { email });
           next(new AppError("Email already registered", null, 409));
         }
-        throw dbError; // Re-throw other DB errors
+        return;
       }
 
       logger.info("User registered successfully");
@@ -94,21 +98,28 @@ export class AuthController {
 
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      logger.warn("Missing required fields");
+      return next(new AppError("Email and password are required", null, 400));
+    }
+
     try {
-      const user = await User.findOne({ email });
-      const isPasswordValid = await bcrypt.compare(
-        password,
-        user?.password as string
-      );
+      const user = await User.findOne({ email }).select("+password");
+      if (!user) {
+        logger.warn("Invalid login attempt - user not found", { email });
+        return next(new AppError("Invalid credentials", null, 401));
+      }
 
-      if (!user || !isPasswordValid) {
-        logger.warn("Invalid login attempt", { email });
+      if (!user.password) {
+        logger.error("User found but password is missing", { email });
+        return next(new AppError("Invalid user data", null, 500));
+      }
 
-        res.status(401).json({
-          trace_id: req.headers["x-trace-id"],
-          message: "Invalid credentials",
-        });
-        return;
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+        logger.warn("Invalid login attempt - incorrect password", { email });
+        return next(new AppError("Invalid credentials", null, 401));
       }
 
       const token = generateToken(user.id, user.role);
@@ -117,11 +128,11 @@ export class AuthController {
 
       // Set the token in a cookie
       res
-        .cookie(envConfig.COOKIE_NAME as string, token, {
-          httpOnly: true, // Helps prevent XSS attacks
-          secure: envConfig.NODE_ENV === "production", // Use secure cookies in production
-          sameSite: "strict", // Helps prevent CSRF attacks
-          maxAge: parseInt(envConfig.COOKIE_MAX_AGE as unknown as string), // 7 days
+        .cookie(envConfig.COOKIE_NAME, token, {
+          httpOnly: true,
+          secure: envConfig.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: envConfig.COOKIE_MAX_AGE,
         })
         .json({
           success: true,
@@ -145,7 +156,7 @@ export class AuthController {
     logger.info("POST /api/v1/auth/reset-password", { email: req.body.email });
 
     const { email, newPassword, oldPassword } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
       logger.warn("Password reset attempted for non-existent user", { email });

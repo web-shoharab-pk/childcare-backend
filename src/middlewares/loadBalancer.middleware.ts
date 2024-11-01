@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { LoadBalancer } from "../services/loadBalancer";
 import logger from "../utils/logger";
-import { AppError } from "./error";
+import { AppError } from "./error.middleware";
 
 const loadBalancer = new LoadBalancer();
 

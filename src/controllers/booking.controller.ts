@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { stripe } from "../config/stripe";
-import { AppError } from "../middlewares/error";
+import { AppError } from "../middlewares/error.middleware";
 import { Activity } from "../models/Activity";
 import { Booking, BookingStatus } from "../models/Booking";
 import { sendBookingConfirmation } from "../utils/email";

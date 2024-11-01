@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import logger from "./logger";
+import logger from "../utils/logger";
 
 interface LogRequestOptions {
   fields?: string[];

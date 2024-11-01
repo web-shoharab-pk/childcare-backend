@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import Stripe from "stripe";
+import { envConfig } from "../config/environment";
 import { stripe } from "../config/stripe";
 import { Booking, BookingStatus } from "../models/Booking";
 import { sendBookingConfirmation } from "../utils/email";
 import logger from "../utils/logger";
-import { envConfig } from "./../config/envConfig";
 
 const endpointSecret = envConfig.STRIPE_WEBHOOK_SECRET as string;
 

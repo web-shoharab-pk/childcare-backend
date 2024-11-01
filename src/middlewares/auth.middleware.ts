@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { envConfig } from "../config/envConfig";
+import { envConfig } from "../config/environment";
 import { verifyToken } from "../utils/jwt";
 
 export const authenticate = (

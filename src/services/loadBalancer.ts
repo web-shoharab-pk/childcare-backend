@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { envConfig } from "../config/envConfig";
+import { envConfig } from "../config/environment";
 import logger from "../utils/logger";
 
 export class LoadBalancer {

@@ -1,6 +1,6 @@
 import { createClerkClient } from "@clerk/clerk-sdk-node";
 import dotenv from "dotenv";
-import { envConfig } from "./envConfig";
+import { envConfig } from "./environment";
 
 dotenv.config();
 

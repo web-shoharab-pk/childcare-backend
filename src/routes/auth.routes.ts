@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { AuthController } from "../controllers/authController";
-import { authenticate } from "../middlewares/authMiddleware";
-import { validateRequest } from "../middlewares/request-validator";
+import { AuthController } from "../controllers/auth.controller";
+import { authenticate } from "../middlewares/auth.middleware";
+import { validateRequest } from "../middlewares/validation.middleware";
 
-import { resetPasswordZodSchema, userZodSchema } from "../schemas/userSchema";
-import { logRequest } from "../utils/log-request";
+import { logRequest } from "../middlewares/logRequest.middleware";
+import { resetPasswordZodSchema, userZodSchema } from "../schemas/user.schema";
 
 const router = Router();
 

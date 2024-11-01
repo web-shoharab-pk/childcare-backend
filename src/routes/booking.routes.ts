@@ -1,17 +1,17 @@
 import { Router } from "express";
-import { BookingController } from "../controllers/bookingController";
-import { authenticate, authorize } from "../middlewares/authMiddleware";
-import { validateRequest } from "../middlewares/request-validator";
-import { activityIdZodSchema } from "../schemas/activitySchema";
+import { BookingController } from "../controllers/booking.controller";
+import { authenticate, authorize } from "../middlewares/auth.middleware";
+import { logRequest } from "../middlewares/logRequest.middleware";
+import { validateRequest } from "../middlewares/validation.middleware";
+import { activityIdZodSchema } from "../schemas/activity.schema";
 import {
   bookingConfirmationZodSchema,
   bookingIdZodSchema,
   bookingZodSchema,
-} from "../schemas/bookingSchema";
-import { mongodbIdSchema } from "../schemas/mongodbIdSchema";
-import { userIdZodSchema } from "../schemas/userSchema";
+} from "../schemas/booking.schema";
+import { mongodbIdSchema } from "../schemas/mongodbId.schema";
+import { userIdZodSchema } from "../schemas/user.schema";
 import { Role } from "../types/Role";
-import { logRequest } from "../utils/log-request";
 
 const router = Router();
 

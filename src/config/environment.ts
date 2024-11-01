@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
+dotenv.config();
 
 // Load environment variables only once
-dotenv.config();
 
 export const envConfig = {
   PORT: process.env.PORT || 5000,

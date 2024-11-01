@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError } from "../middlewares/error";
+import { AppError } from "../middlewares/error.middleware";
 import { Activity } from "../models/Activity";
-import logger from "../utils/logger";
 import { Booking } from "../models/Booking";
+import logger from "../utils/logger";
 
 export class ActivityController {
   // Create a new activity
@@ -212,19 +212,28 @@ export class ActivityController {
 
       // Generate report statistics
       const totalActivities = activities.length;
-      const upcomingActivities = activities.filter(a => new Date(a.date) > new Date()).length;
+      const upcomingActivities = activities.filter(
+        (a) => new Date(a.date) > new Date()
+      ).length;
       const pastActivities = totalActivities - upcomingActivities;
-      const averageAttendance = totalActivities ? 
-        activities.reduce((acc, curr) => acc + curr.attendees.length, 0) / totalActivities : 0;
+      const averageAttendance = totalActivities
+        ? activities.reduce((acc, curr) => acc + curr.attendees.length, 0) /
+          totalActivities
+        : 0;
 
-      const activitiesByLocation = activities.reduce((acc: Record<string, number>, curr) => {
-        acc[curr.location] = (acc[curr.location] || 0) + 1;
-        return acc;
-      }, {});
+      const activitiesByLocation = activities.reduce(
+        (acc: Record<string, number>, curr) => {
+          acc[curr.location] = (acc[curr.location] || 0) + 1;
+          return acc;
+        },
+        {}
+      );
 
       // Calculate total bookings for each activity
       const bookingsPromises = activities.map(async (activity) => {
-        const totalBookings = await Booking.countDocuments({ activityId: activity._id });
+        const totalBookings = await Booking.countDocuments({
+          activityId: activity._id,
+        });
         return {
           id: activity._id,
           name: activity.name,
@@ -261,7 +270,13 @@ export class ActivityController {
       });
     } catch (error) {
       logger.error("Failed to generate activity report", { error });
-      next(new AppError("Failed to generate activity report", "REPORT_GENERATION_ERROR", 500));
+      next(
+        new AppError(
+          "Failed to generate activity report",
+          "REPORT_GENERATION_ERROR",
+          500
+        )
+      );
     }
   }
 

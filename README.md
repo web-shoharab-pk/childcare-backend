@@ -22,6 +22,90 @@ A robust Express.js API built with TypeScript for managing childcare activities 
 - MongoDB installed and running locally
 - Clerk account with API keys
 
+// ... previous content ...
+
+## Project Structure
+
+```
+childcare-backend/
+├── src/
+│   ├── config/
+│   │   ├── database.ts
+│   │   ├── stripe.ts
+│   │   ├── clerk.ts
+│   │   └── environment.ts
+│   ├── controllers/
+│   │   ├── activity.controller.ts
+│   │   ├── booking.controller.ts
+│   │   └── auth.controller.ts
+│   ├── middleware/
+│   │   ├── auth.middleware.ts
+│   │   ├── error.middleware.ts
+│   │   ├── loadBalancer.middleware.ts
+│   │   ├── logRequest.middleware.ts
+│   │   ├── setCorrelationId.ts
+│   │   └── validation.middleware.ts
+│   ├── models/
+│   │   ├── Activity.ts
+│   │   ├── Booking.ts
+│   │   └── User.ts
+│   ├── routes/
+│   │   ├── activity.routes.ts
+│   │   ├── booking.routes.ts
+│   │   └── auth.routes.ts
+│   ├── schemas/
+│   │   ├── activity.schema.ts
+│   │   ├── booking.schema.ts
+│   │   ├── mongodbId.schema.ts
+│   │   └── user.schema.ts
+│   ├── services/
+│   │   └── loadBalancer.ts
+│   ├── types/
+│   │   └── Role.ts
+│   ├── utils/
+│   │   ├── email.ts
+│   │   ├── logger.ts
+│   │   └── jwt.ts
+│   ├── webhooks/
+│   │   └── webhook.ts
+│   └── app.ts
+├── logs/
+├── dist/
+├── .env
+├── .env.example
+├── .gitignore
+├── .npmrc
+├── LICENSE
+├── package.json
+├── README.md
+└── tsconfig.json
+```
+
+### Directory Structure Explanation
+
+- **src/**: Contains the main application source code
+
+  - **config/**: Configuration files for database, environment variables, etc.
+  - **controllers/**: Request handlers for different routes
+  - **middleware/**: Custom middleware functions
+  - **models/**: Database models and schemas
+  - **routes/**: API route definitions
+  - **services/**: Business logic layer
+  - **utils/**: Helper functions and utilities
+  - **types/**: TypeScript type definitions
+  - **app.ts**: Main application entry point
+
+- **tests/**: Test files (not implemented)
+
+  - **integration/**: Integration tests (not implemented)
+  - **unit/**: Unit tests (not implemented)
+
+- **logs/**: Application logs directory
+- **.env**: Environment variables (not tracked in git)
+- **.env.example**: Example environment variables template
+- **package.json**: Project dependencies and scripts
+- **tsconfig.json**: TypeScript configuration
+
 ## Getting Started
 
 1. Clone the repository:
@@ -141,11 +225,12 @@ The API will be available at `http://localhost:5000`
 ## API Documentation
 
 For detailed API documentation, please visit:
-[Postman Documentation](https://documenter.getpostman.com/view/16481716/2sAY4viNnz)
+[Postman Documentation](https://documenter.getpostman.com/view/16481716/2sAY4x9gJG)
 
 ## Application URL
 
 The application is deployed at:
+
 ```
 https://childcare-backend-uyed.render.com
 ```
@@ -155,6 +240,7 @@ https://childcare-backend-uyed.render.com
 ## Load Balancer Configuration
 
 While currently operating as a monolithic application, the system is designed with future scalability in mind. The load balancer can be configured using:
+
 ```
 LOAD_BALANCER_URL=http://localhost:5000
 ```
