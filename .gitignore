@@ -38,3 +38,7 @@ coverage/
 
 # Coverage report
 coverage/
+
+# SonarQube
+sonar-project.properties
+.scannerwork/

@@ -172,7 +172,7 @@ export class AuthController {
       try {
         const isPasswordValid = await bcrypt.compare(
           oldPassword,
-          user.password as string
+          user.password
         );
         if (!isPasswordValid) {
           res.status(401).json({
@@ -221,7 +221,7 @@ export class AuthController {
 
   // Logout
   static async logout(req: Request, res: Response, next: NextFunction) {
-    res.clearCookie(envConfig.COOKIE_NAME as string).json({
+    res.clearCookie(envConfig.COOKIE_NAME).json({
       success: true,
       trace_id: req.headers["x-trace-id"],
       message: "Logged out successfully",

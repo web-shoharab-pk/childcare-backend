@@ -3,14 +3,14 @@ import { envConfig } from "../config/environment";
 import logger from "../utils/logger";
 
 export class LoadBalancer {
-  private services: Record<string, string[]>;
-  private currentIndex: Record<string, number>;
-  private healthStatus: Record<string, Record<string, boolean>>;
+  private readonly services: Record<string, string[]>;
+  private readonly currentIndex: Record<string, number>;
+  private readonly healthStatus: Record<string, Record<string, boolean>>;
   private readonly MAX_RETRIES = 3;
 
   constructor() {
     const mainServiceUrl =
-      envConfig.SERVER_URL || `http://localhost:${envConfig.PORT || 5000}`;
+      envConfig.SERVER_URL ?? `http://localhost:${envConfig.PORT ?? 5000}`;
 
     // For now, all services point to the same instance
     this.services = {
@@ -70,7 +70,7 @@ export class LoadBalancer {
 
   async checkHealth(serviceUrl: string): Promise<boolean> {
     try {
-      const response = await axios.get(`${serviceUrl}/health`, {
+      await axios.get(`${serviceUrl}/health`, {
         timeout: 5000,
         validateStatus: (status) => status === 200,
       });

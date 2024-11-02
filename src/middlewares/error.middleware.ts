@@ -9,6 +9,72 @@ interface CustomError extends Error {
   errors?: any;
 }
 
+const handleMongoError = (err: MongoError, req: Request, res: Response) => {
+  if (err.code === 11000) {
+    res.status(409).json({
+      success: false,
+      trace_id: req.headers["x-trace-id"],
+      message: "Duplicate Entry",
+      error: "A record with this information already exists",
+    });
+  } else {
+    res.status(400).json({
+      success: false,
+      trace_id: req.headers["x-trace-id"],
+      message: "Database Error",
+      error:
+        envConfig.NODE_ENV === "production"
+          ? "Database operation failed"
+          : err.message,
+    });
+  }
+};
+
+const handleZodError = (err: ZodError, req: Request, res: Response) => {
+  res.status(400).json({
+    success: false,
+    trace_id: req.headers["x-trace-id"],
+    message: "Validation Error",
+    errors: err.errors.map((e) => ({
+      field: e.path.join("."),
+      message: e.message,
+    })),
+  });
+};
+
+const handleHttpError = (err: CustomError, req: Request, res: Response) => {
+  const statusCode = err.status ?? 500; // Default to 500 if status is undefined
+  res.status(statusCode).json({
+    success: false,
+    trace_id: req.headers["x-trace-id"],
+    message: err.message,
+    error: err.name,
+    errors: typeof err.errors === "string" ? [err.errors] : err.errors,
+  });
+};
+
+const handleJwtError = (err: CustomError, req: Request, res: Response) => {
+  res.status(401).json({
+    success: false,
+    trace_id: req.headers["x-trace-id"],
+    message: "Authentication Error",
+    error: err.message,
+  });
+};
+
+const handleDefaultError = (err: CustomError, req: Request, res: Response) => {
+  res.status(500).json({
+    success: false,
+    trace_id: req.headers["x-trace-id"],
+    message: "Internal Server Error",
+    error:
+      envConfig.NODE_ENV === "production"
+        ? "Something went wrong"
+        : err.message,
+    stack: envConfig.NODE_ENV === "development" ? err.stack : undefined,
+  });
+};
+
 export const errorHandler = (
   err: CustomError,
   req: Request,
@@ -25,109 +91,45 @@ export const errorHandler = (
     });
   }
 
-  // Handle MongoDB specific errors
   if (err instanceof MongoError) {
-    if (err.code === 11000) {
-      // Duplicate key error
-      res.status(409).json({
-        success: false,
-        trace_id: req.headers["x-trace-id"],
-        message: "Duplicate Entry",
-        error: "A record with this information already exists",
-      });
-      return;
-    }
-    res.status(400).json({
-      success: false,
-      trace_id: req.headers["x-trace-id"],
-      message: "Database Error",
-      error:
-        envConfig.NODE_ENV === "production"
-          ? "Database operation failed"
-          : err.message,
-    });
-    return;
+    return handleMongoError(err, req, res);
   }
 
-  // Handle Zod validation errors
   if (err instanceof ZodError) {
-    res.status(400).json({
-      success: false,
-      trace_id: req.headers["x-trace-id"],
-      message: "Validation Error",
-      errors: err.errors.map((e) => ({
-        field: e.path.join("."),
-        message: e.message,
-      })),
-    });
-    return;
+    return handleZodError(err, req, res);
   }
 
-  // Handle known HTTP errors
   if (err.status) {
-    res.status(err.status).json({
-      success: false,
-      trace_id: req.headers["x-trace-id"],
-      message: err.message,
-      error: err.name,
-      errors: typeof err.errors === "string" ? [err.errors] : err.errors,
-    });
-    return;
+    return handleHttpError(err, req, res);
   }
 
-  // Handle JWT errors
   if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
-    res.status(401).json({
+    return handleJwtError(err, req, res);
+  }
+
+  if (
+    ["ValidationError", "UnauthorizedError", "ForbiddenError"].includes(
+      err.name
+    )
+  ) {
+    let statusCode;
+    if (err.name === "ValidationError") {
+      statusCode = 400;
+    } else if (err.name === "UnauthorizedError") {
+      statusCode = 401;
+    } else {
+      statusCode = 403;
+    }
+    res.status(statusCode).json({
       success: false,
       trace_id: req.headers["x-trace-id"],
-      message: "Authentication Error",
+      message: err.name === "ValidationError" ? "Validation Error" : err.name,
       error: err.message,
     });
     return;
   }
 
-  // Handle validation errors
-  if (err.name === "ValidationError") {
-    res.status(400).json({
-      success: false,
-      trace_id: req.headers["x-trace-id"],
-      message: "Validation Error",
-      error: err.message,
-    });
-  }
-
-  // Handle unauthorized errors
-  if (err.name === "UnauthorizedError") {
-    res.status(401).json({
-      success: false,
-      trace_id: req.headers["x-trace-id"],
-      message: "Unauthorized",
-      error: err.message,
-    });
-  }
-
-  // Handle forbidden errors
-  if (err.name === "ForbiddenError") {
-    res.status(403).json({
-      success: false,
-      trace_id: req.headers["x-trace-id"],
-      message: "Forbidden",
-      error: err.message,
-    });
-  }
-
-  // Default server error
-  res.status(500).json({
-    success: false,
-    trace_id: req.headers["x-trace-id"],
-    message: "Internal Server Error",
-    error:
-      envConfig.NODE_ENV === "production"
-        ? "Something went wrong"
-        : err.message,
-    stack: envConfig.NODE_ENV === "development" ? err.stack : undefined,
-  });
-  return;
+  return handleDefaultError(err, req, res);
 };
 
 // Error creator utility

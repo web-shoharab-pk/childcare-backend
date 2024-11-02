@@ -9,7 +9,7 @@ export const proxyRequest = (serviceName: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Get next available service instance
-      const serviceUrl = await loadBalancer.getNextHealthyService(serviceName);
+      await loadBalancer.getNextHealthyService(serviceName);
       // Instead of proxying to different instances, just forward to the next middleware
       next();
     } catch (error) {

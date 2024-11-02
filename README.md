@@ -75,13 +75,15 @@ childcare-backend/
 ├── dist/
 ├── coverage/
 ├── .env
+├── .env.test
 ├── .env.example
 ├── .gitignore
 ├── .npmrc
-├── jest.config.js
+├── jest.config.ts
 ├── LICENSE
 ├── package.json
 ├── README.md
+├── sonar-project.properties
 └── tsconfig.json
 ```
 
@@ -106,9 +108,11 @@ childcare-backend/
 
 - **logs/**: Application logs directory
 - **.env**: Environment variables (not tracked in git)
+- **.env.test**: Test environment variables (not tracked in git)
 - **.env.example**: Example environment variables template
 - **package.json**: Project dependencies and scripts
 - **tsconfig.json**: TypeScript configuration
+- **sonar-project.properties**: SonarQube configuration
 
 ## Getting Started
 
@@ -152,6 +156,15 @@ childcare-backend/
    SMPT_MAIL=
    SMPT_SERVICE=
    SMPT_PASSWORD=
+   ```
+   Create a `.env.test` file in the root directory with the same variables as `.env` but with test values.
+   ```
+   # Test environment
+   TEST_USER_PASSWORD=
+   TEST_USER_EMAIL=
+   TEST_USER_WEAK_PASSWORD=
+   TEST_USER_WRONG_PASSWORD=
+   TEST_USER_NEW_PASSWORD=
    ```
 
 4. Start the development server:
@@ -252,3 +265,23 @@ LOAD_BALANCER_URL=http://localhost:5000
 ## Node Version Requirements
 
 - Supported Node.js versions: >16.x.x and <21.x.x
+
+## Payment Information
+
+When you book an activity, you will receive a payment link. You can use the following Stripe test card details for payment:
+
+- **Card Number:** 4242 4242 4242 4242
+- **Expiration Date:** Any future date (e.g., 12/34)
+- **CVC:** Any 3-digit number (e.g., 123)
+- **ZIP Code:** Any valid postal code (e.g., 12345)
+
+Please ensure to use these test card details only in the testing environment.
+
+## Email Confirmation
+
+After completing your booking, you will receive a confirmation email. Below is an example of what the email will look like:
+
+![Email Confirmation Example](src/assets/email-sending-example.png)
+
+
+![SonarQube Test Report](src/assets/sonarqube-test-report.png)

@@ -7,7 +7,7 @@ export const authenticate = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies[envConfig.COOKIE_NAME as string];
+  const token = req.cookies[envConfig.COOKIE_NAME];
   if (!token) {
     res.status(401).json({
       success: false,

@@ -26,7 +26,7 @@ app.use(helmet());
 // Enable CORS for all origins
 app.use(
   cors({
-    origin: "*",
+    origin: [envConfig.FRONTEND_URL],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "x-trace-id"],
     credentials: true,
@@ -74,7 +74,7 @@ app.get("/loadbalancer/status", async (req: Request, res: Response) => {
       timestamp: new Date().toISOString(),
       services: serviceStatus,
       health: healthStatus,
-      environment: envConfig.NODE_ENV || "development",
+      environment: envConfig.NODE_ENV ?? "development",
     });
   } catch (error) {
     logger.error("Error getting load balancer status:", error);
@@ -82,7 +82,7 @@ app.get("/loadbalancer/status", async (req: Request, res: Response) => {
       status: "error",
       message: "Failed to get load balancer status",
       timestamp: new Date().toISOString(),
-      correlationId: req.headers["x-trace-id"] || "not-set",
+      traceId: req.headers["x-trace-id"] ?? "not-set",
     });
   }
 });
@@ -92,7 +92,7 @@ app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({
     status: "healthy",
     timestamp: new Date().toISOString(),
-    environment: envConfig.NODE_ENV || "development",
+    environment: envConfig.NODE_ENV ?? "development",
     version: "1.0.0",
     uptime: process.uptime(),
     memory: process.memoryUsage(),
@@ -110,11 +110,10 @@ app.use("*", (req: Request, res: Response) => {
     path: req.originalUrl,
     method: req.method,
     timestamp: new Date().toISOString(),
-    correlationId: req.headers["x-trace-id"] || "not-set",
+    traceId: req.headers["x-trace-id"] ?? "not-set",
   });
 });
 
-// Global error handler
 app.use(errorHandler);
 
 export default app;

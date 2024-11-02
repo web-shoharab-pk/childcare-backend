@@ -4,7 +4,7 @@ import { envConfig } from "../config/environment";
 
 dotenv.config();
 
-const JWT_SECRET = envConfig.JWT_SECRET as string;
+const JWT_SECRET = envConfig.JWT_SECRET;
 
 export const generateToken = (userId: string, role: string) => {
   const token = jwt.sign({ userId, role }, JWT_SECRET, {

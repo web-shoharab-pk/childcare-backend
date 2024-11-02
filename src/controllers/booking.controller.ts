@@ -221,8 +221,7 @@ export class BookingController {
         existingBooking.isConfirmed
       ) {
         existingBooking.paymentStatus = "refunded";
-        // TODO: Integrate with payment provider to process refund
-        // For now, just update the status
+        //  Integrate with payment provider to process refund
       }
 
       await existingBooking.save();

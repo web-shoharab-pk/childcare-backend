@@ -7,7 +7,7 @@ import logger from "./utils/logger";
 const startServer = async () => {
   try {
     await connectMongo();
-    const PORT = envConfig.PORT || 5000;
+    const PORT = envConfig.PORT ?? 5000;
     const server = app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
     });
@@ -21,8 +21,9 @@ const startServer = async () => {
       });
     };
 
-    process.on("unhandledRejection", (reason, promise) => {
-      logger.error(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
+    process.on("unhandledRejection", (reason) => {
+      const reasonString = typeof reason === 'object' && reason !== null ? '[object Object]' : reason;
+      logger.error(`Unhandled Rejection reason: ${reasonString}`);
       shutdownServer();
     });
 

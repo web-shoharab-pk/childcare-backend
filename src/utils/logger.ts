@@ -8,11 +8,11 @@ const LOG_DIR = "logs";
 
 class LogManager {
   private static instance: LogManager;
-  private logger: any;
-  nodeEnv: string;
+  private readonly logger: any;
+  private readonly nodeEnv: string;
 
   constructor() {
-    this.nodeEnv = envConfig.NODE_ENV || "development";
+    this.nodeEnv = envConfig.NODE_ENV ?? "development";
     this.logger = createLogger({
       level: "info",
       format: format.combine(

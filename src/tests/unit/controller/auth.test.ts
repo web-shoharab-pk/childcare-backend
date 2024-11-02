@@ -34,7 +34,7 @@ describe("Auth Controller", () => {
   });
 
   afterEach(async () => {
-    await app.close(); // Ensure the server is closed after each test
+    app.close(); // Ensure the server is closed after each test
   });
 
   beforeAll(async () => {
@@ -63,8 +63,8 @@ describe("Auth Controller", () => {
   describe("POST /auth/register", () => {
     const registerEndpoint = "/api/v1/auth/register";
     const validUserData = {
-      email: "test@example.com",
-      password: "Password123!",
+      email: envConfig.TEST_USER_EMAIL,
+      password: envConfig.TEST_USER_PASSWORD,
       role: Role.USER,
     };
 
@@ -114,7 +114,7 @@ describe("Auth Controller", () => {
         .post(registerEndpoint)
         .send({
           ...validUserData,
-          password: "weak",
+          password: envConfig.TEST_USER_WEAK_PASSWORD,
         });
 
       expect(response.status).toBe(400);
@@ -153,8 +153,8 @@ describe("Auth Controller", () => {
   describe("POST /auth/login", () => {
     const loginEndpoint = "/api/v1/auth/login";
     const userCredentials = {
-      email: "test@example.com",
-      password: "Password123!",
+      email: envConfig.TEST_USER_EMAIL,
+      password: envConfig.TEST_USER_PASSWORD,
     };
 
     beforeEach(async () => {
@@ -190,7 +190,7 @@ describe("Auth Controller", () => {
     it("should return 401 for invalid password", async () => {
       const response = await request(app).post(loginEndpoint).send({
         email: userCredentials.email,
-        password: "wrongpassword",
+        password: envConfig.TEST_USER_WRONG_PASSWORD,
       });
 
       expect(response.status).toBe(401);
@@ -213,18 +213,16 @@ describe("Auth Controller", () => {
   describe("POST /auth/logout", () => {
     it("should clear auth cookie and return success", async () => {
       // Create a test user first
-      const registerResponse = await request(app)
-        .post("/api/v1/auth/register")
-        .send({
-          email: "test@example.com",
-          password: "Password123!",
-          role: Role.USER,
-        });
+      await request(app).post("/api/v1/auth/register").send({
+        email: envConfig.TEST_USER_EMAIL,
+        password: envConfig.TEST_USER_PASSWORD,
+        role: Role.USER,
+      });
 
       // Login to get auth token
       const loginResponse = await request(app).post("/api/v1/auth/login").send({
-        email: "test@example.com",
-        password: "Password123!",
+        email: envConfig.TEST_USER_EMAIL,
+        password: envConfig.TEST_USER_PASSWORD,
       });
 
       // Extract auth token from cookie
@@ -263,18 +261,16 @@ describe("Auth Controller", () => {
 
     beforeEach(async () => {
       // Create a test user first
-      const registerResponse = await request(app)
-        .post("/api/v1/auth/register")
-        .send({
-          email: "test@example.com",
-          password: "Password123!",
-          role: Role.USER,
-        });
+      await request(app).post("/api/v1/auth/register").send({
+        email: envConfig.TEST_USER_EMAIL,
+        password: envConfig.TEST_USER_PASSWORD,
+        role: Role.USER,
+      });
 
       // Login to get auth token
       const loginResponse = await request(app).post("/api/v1/auth/login").send({
-        email: "test@example.com",
-        password: "Password123!",
+        email: envConfig.TEST_USER_EMAIL,
+        password: envConfig.TEST_USER_PASSWORD,
       });
 
       // Extract auth token from cookie
@@ -288,9 +284,9 @@ describe("Auth Controller", () => {
         .patch(resetPasswordEndpoint)
         .set("Cookie", [`auth_token=${authToken}`])
         .send({
-          email: "test@example.com",
-          oldPassword: "Password123!",
-          newPassword: "NewPassword123!",
+          email: envConfig.TEST_USER_EMAIL,
+          oldPassword: envConfig.TEST_USER_PASSWORD,
+          newPassword: envConfig.TEST_USER_NEW_PASSWORD,
         });
 
       expect(response.status).toBe(200);
@@ -302,20 +298,21 @@ describe("Auth Controller", () => {
 
       // Verify password was actually changed
       const updatedUser = await User.findOne({
-        email: "test@example.com",
+        email: envConfig.TEST_USER_EMAIL,
       }).select("+password");
-      const canLoginWithNewPassword = await bcrypt.compare(
-        "NewPassword123!",
-        updatedUser!.password!
-      );
-      expect(canLoginWithNewPassword).toBe(true);
+
+      if (updatedUser) {
+        expect(await bcrypt.compare(envConfig.TEST_USER_NEW_PASSWORD, updatedUser.password)).toBe(true);
+      } else {
+        throw new Error("User not found");
+      }
     });
 
     it("should return 401 when not authenticated", async () => {
       const response = await request(app).patch(resetPasswordEndpoint).send({
         email: "test@example.com",
-        oldPassword: "Password123!",
-        newPassword: "NewPassword123!",
+        oldPassword: envConfig.TEST_USER_PASSWORD,
+        newPassword: envConfig.TEST_USER_NEW_PASSWORD,
       });
 
       expect(response.status).toBe(401);
@@ -327,8 +324,8 @@ describe("Auth Controller", () => {
         .set("Cookie", [`auth_token=${authToken}`])
         .send({
           email: "test@example.com",
-          oldPassword: "WrongPassword123!",
-          newPassword: "NewPassword123!",
+          oldPassword: envConfig.TEST_USER_WRONG_PASSWORD,
+          newPassword: envConfig.TEST_USER_NEW_PASSWORD,
         });
 
       expect(response.status).toBe(401);
@@ -341,8 +338,8 @@ describe("Auth Controller", () => {
         .set("Cookie", [`auth_token=${authToken}`])
         .send({
           email: "nonexistent@example.com",
-          oldPassword: "Password123!",
-          newPassword: "NewPassword123!",
+          oldPassword: envConfig.TEST_USER_PASSWORD,
+          newPassword: envConfig.TEST_USER_NEW_PASSWORD,
         });
 
       expect(response.status).toBe(404);
@@ -355,8 +352,8 @@ describe("Auth Controller", () => {
         .set("Cookie", [`auth_token=${authToken}`])
         .send({
           email: "test@example.com",
-          oldPassword: "Password123!",
-          newPassword: "weak", // Invalid password
+          oldPassword: envConfig.TEST_USER_PASSWORD,
+          newPassword: envConfig.TEST_USER_WEAK_PASSWORD, // Invalid password
         });
 
       expect(response.status).toBe(400);

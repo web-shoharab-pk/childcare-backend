@@ -223,7 +223,7 @@ export class ActivityController {
 
       const activitiesByLocation = activities.reduce(
         (acc: Record<string, number>, curr) => {
-          acc[curr.location] = (acc[curr.location] || 0) + 1;
+          acc[curr.location] = (acc[curr.location] ?? 0) + 1;
           return acc;
         },
         {}
