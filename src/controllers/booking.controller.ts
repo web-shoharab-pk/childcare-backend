@@ -5,6 +5,7 @@ import { Activity } from "../models/Activity";
 import { Booking, BookingStatus } from "../models/Booking";
 import { sendBookingConfirmation } from "../utils/email";
 import logger from "../utils/logger"; // Import the logger
+import { envConfig } from "../config/environment";
 
 export class BookingController {
   // Create a new booking
@@ -66,8 +67,8 @@ export class BookingController {
           },
         ],
         mode: "payment",
-        success_url: `${process.env.FRONTEND_URL}/booking-confirmation?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.FRONTEND_URL}/booking-cancelled`,
+        success_url: `${envConfig.FRONTEND_URL}/booking-confirmation?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${envConfig.FRONTEND_URL}/booking-cancelled`,
         metadata: {
           bookingId: booking.id,
           userId: userId,
