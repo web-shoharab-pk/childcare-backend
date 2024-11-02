@@ -281,7 +281,7 @@ Please ensure to use these test card details only in the testing environment.
 
 After completing your booking, you will receive a confirmation email. Below is an example of what the email will look like:
 
-![Email Confirmation Example](src/assets/email-sending-example.png)
+![Email Confirmation Example](src/assests/email-sending-example.png)
 
 
-![SonarQube Test Report](src/assets/sonarqube-test-report.png)
+![SonarQube Test Report](src/assests/sonarqube-test-report.png)
